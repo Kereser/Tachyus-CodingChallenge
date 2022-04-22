@@ -1,0 +1,23 @@
+.dropzone {
+  background: #eee;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  padding: 20px;
+  cursor: pointer;
+  height: 50px;
+  width: 100%;
+  outline: none;
+}
+
+.dropzoneAccept {
+  background: #aaa;
+  color: #fff;    
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
