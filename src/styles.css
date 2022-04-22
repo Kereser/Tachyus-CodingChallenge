@@ -1,3 +1,13 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: 'hidden';
+}
+
 .dropzone {
   background: #eee;
   display: flex;
@@ -13,11 +23,9 @@
 
 .dropzoneAccept {
   background: #aaa;
-  color: #fff;    
+  color: #fff;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+.container-grid {
+  margin-top: 3rem;
 }
