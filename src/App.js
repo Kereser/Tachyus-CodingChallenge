@@ -1,16 +1,19 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { csv } from 'd3'
 import pDatacsv from './data/dataP.csv'
 import cDataCsv from './data/dataC.csv'
 
 import AgGrid from './components/AgGrid'
-import NivoVisualization from './components/NivoVisualization'
+// import NivoVisualization from './components/NivoVisualization'
 import InputButton from './components/InputButton'
+import Visualization from './components/Visualization'
 
 function App() {
   const [dataRow, setDataRow] = useState([])
+  const [initialData, setInitialData] = useState([])
   const [dataColumns, setDataColumns] = useState([])
   const [dataRowP, setDataRowP] = useState([])
+  const [initialDataP, setInitialDataP] = useState([])
   const [dataColumnsP, setDataColumnsP] = useState([])
   const [filt, setFilt] = useState('')
   const [dataForG, setDataForG] = useState([])
@@ -19,6 +22,7 @@ function App() {
     csv(cDataCsv).then((data) => {
       setDataRow(data.slice(0, data.length))
       setDataColumns(data.columns)
+      setInitialData(data.slice(0, data.length))
     })
     csv(pDatacsv).then((data) => {
       const onlyRows = data.slice(0, data.length)
@@ -30,46 +34,47 @@ function App() {
         }
       })
       setDataRowP(newDataP)
+      setInitialDataP(newDataP)
       setDataColumnsP([...data.columns, 'Gross'])
     })
   }, [])
 
   useEffect(() => {
-    const rawData = dataForGraph()
-    const result = rateGraphEnergyData(rawData)
-    setDataForG(result)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataRow, dataRowP])
+    const rowInformation = initialData.find((d) => d.wellName === filt)
+    // Another state to change one and be able to show with the other a updated state.
 
-  useEffect(() => {
-    const rowInformation = dataRow.find((d) => d.wellName === filt)
-    const dataR = dataRow.filter((d) => d.wellAPI === rowInformation.wellAPI)
-    const dataP = dataRowP.filter((d) => d.wellAPI === rowInformation.wellAPI)
-    setDataRow(dataR)
-    setDataRowP(dataP)
+    if (!rowInformation) {
+      setDataRow(initialData)
+      setDataRowP(initialDataP)
+    } else {
+      const dataC = initialData.filter(
+        (d) => d.wellAPI === rowInformation.wellAPI,
+      )
+      const dataP = initialDataP.filter(
+        (d) => d.wellAPI === rowInformation.wellAPI,
+      )
+      setDataRow(dataC)
+      setDataRowP(dataP)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filt])
 
-  const dataForGraph = () => {
+  const getDataForGraph = () => {
     let data = [
       {
         id: 'Oil',
-        color: 'hsl(261, 70%, 50%)',
         data: [],
       },
       {
         id: 'Water',
-        color: 'hsl(312, 70%, 50%)',
         data: [],
       },
       {
         id: 'Gas',
-        color: 'hsl(104, 70%, 50%)',
         data: [],
       },
       {
         id: 'WaterInj',
-        color: 'hsl(356, 70%, 50%)',
         data: [],
       },
     ]
@@ -95,49 +100,63 @@ function App() {
       }
     }
 
-    return data
-  }
+    let otherData = [['Year', 'Oil', 'Water', 'Gas', 'WaterInj']]
 
-  const rateGraphEnergyData = (data) => {
-    let newData = [
-      {
-        id: 'Oil',
-        color: 'hsl(261, 70%, 50%)',
-        data: [],
-      },
-      {
-        id: 'Water',
-        color: 'hsl(312, 70%, 50%)',
-        data: [],
-      },
-      {
-        id: 'Gas',
-        color: 'hsl(104, 70%, 50%)',
-        data: [],
-      },
-      {
-        id: 'WaterInj',
-        color: 'hsl(356, 70%, 50%)',
-        data: [],
-      },
-    ]
-
+    // ? Making the data in the right format.
     for (let i = 0; i < 4; i++) {
-      newData[i].data = data[i].data.map((el, i, arr) => {
-        const [key] = Object.keys(el)
-        return {
-          x: key,
-          y: Object.values(el) / Object.values(arr[i === 0 ? i : i - 1]) - 1,
-        }
-      })
+      // I create the years with the valies of oil
+      if (i === 0) {
+        data[i]['data'].forEach((d) => {
+          const year = Object.keys(d)
+          otherData.push([parseInt(year, 10), d[year]])
+        })
+      }
+      // I have to modify those array to concat the rest of values of the other energies
+      // d === {2005: valor}
+      else {
+        otherData.map((el, j) => {
+          if (j === 0) return el
+          return el.push(Object.values(data[i]['data'][j - 1])[0])
+        })
+      }
     }
 
-    return newData
+    // I need to find the rate.
+    // The rate is the difference between a value and the previous one.
+
+    const headers = otherData.shift()
+
+    let newArr = []
+    for (let i = 1; i < 5; i++) {
+      // 'For' to go through energies
+      // Starting at 1 to not take the year value
+      // Changing the arrayToUse because if not, im going to work with the same as always and im getting the changes only in the last energy column
+      let arrayToUse = i === 1 ? otherData : newArr
+      newArr = arrayToUse.map((el, j, arr) => {
+        // Change the values for the Oil
+        if (j === 0) return el
+        const fOValue = el[i]
+        const sOValue = arr[j - 1][i]
+        const rate = fOValue / sOValue - 1
+        const copy = [...el]
+        copy[i] = rate
+        return copy
+      })
+    }
+    const firstRow = [2005, 0, 0, 0, 0]
+    newArr[0] = firstRow
+    newArr.unshift(headers)
+    return newArr
   }
+
+  useEffect(() => {
+    const r = getDataForGraph()
+    setDataForG(r)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataRowP])
 
   return (
     <>
-      {console.log('Renderizo return de app')}
       <div className="App">
         <section className="start-section">
           <div className="input-search">
@@ -166,7 +185,7 @@ function App() {
           <div>
             <h1>Visualization of the Rate for different energies over time</h1>
             <div style={{ height: '70vh', width: '100%' }}>
-              <NivoVisualization data={dataForG} />
+              <Visualization data={dataForG} />
             </div>
           </div>
         </section>
