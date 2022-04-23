@@ -1,16 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { csv } from 'd3'
 import pDatacsv from './data/dataP.csv'
 import cDataCsv from './data/dataC.csv'
 
 import AgGrid from './components/AgGrid'
 import NivoVisualization from './components/NivoVisualization'
+import InputButton from './components/InputButton'
 
 function App() {
   const [dataRow, setDataRow] = useState([])
   const [dataColumns, setDataColumns] = useState([])
   const [dataRowP, setDataRowP] = useState([])
   const [dataColumnsP, setDataColumnsP] = useState([])
+  const [filt, setFilt] = useState('')
+  const [dataForG, setDataForG] = useState([])
 
   useEffect(() => {
     csv(cDataCsv).then((data) => {
@@ -31,10 +34,24 @@ function App() {
     })
   }, [])
 
-  console.log(dataRowP)
+  useEffect(() => {
+    const rawData = dataForGraph()
+    const result = rateGraphEnergyData(rawData)
+    setDataForG(result)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataRow, dataRowP])
+
+  useEffect(() => {
+    const rowInformation = dataRow.find((d) => d.wellName === filt)
+    const dataR = dataRow.filter((d) => d.wellAPI === rowInformation.wellAPI)
+    const dataP = dataRowP.filter((d) => d.wellAPI === rowInformation.wellAPI)
+    setDataRow(dataR)
+    setDataRowP(dataP)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filt])
 
   const dataForGraph = () => {
-    const data = [
+    let data = [
       {
         id: 'Oil',
         color: 'hsl(261, 70%, 50%)',
@@ -61,46 +78,27 @@ function App() {
       // k for energies
       for (let i = 2005; i < 2019; i++) {
         // i for years
-        for (let j = 1; j < 13; j++) {
-          // j for months
-          const arrayEveryMonth = dataRowP.filter(
-            (d) =>
-              d['Year'] === i.toString(10) && d['Month'] === j.toString(10),
-          )
+        const arrayEveryYear = dataRowP.filter((d) => {
+          return d['Year'] === i.toString(10)
+        })
+        // Assign the value of the corresponding energy
 
-          // Assign the value of the corresponding energy
-
-          data[k]['data'].push({
-            [`${i}-${j}`]:
-              arrayEveryMonth.reduce(
-                (acc, el) =>
-                  acc +
-                  +el[k === 0 ? 'Qo' : k === 1 ? 'Qw' : k === 2 ? 'Qg' : 'Qs'],
-                0,
-              ) / arrayEveryMonth.length,
-          })
-        }
+        data[k]['data'].push({
+          [i]:
+            arrayEveryYear.reduce((acc, el) => {
+              return (
+                acc +
+                +el[k === 0 ? 'Qo' : k === 1 ? 'Qw' : k === 2 ? 'Qg' : 'Qs']
+              )
+            }, 0) / arrayEveryYear.length,
+        })
       }
     }
 
     return data
   }
-  const datafromfunc = dataForGraph()
-  console.log(datafromfunc)
 
   const rateGraphEnergyData = (data) => {
-    const fixedData = []
-
-    for (let k = 0; k < 4; k++) {
-      // k for energies
-      //? Because we dont want to skip the first month for all years, have yo keep just the values on every array.
-      fixedData.push(
-        data[k]['data'].map((d) => {
-          return Object.values(d)
-        }),
-      )
-    }
-
     let newData = [
       {
         id: 'Oil',
@@ -123,49 +121,55 @@ function App() {
         data: [],
       },
     ]
+
     for (let i = 0; i < 4; i++) {
-      const holderData = data[i].data.map((el, i, arr) => {
+      newData[i].data = data[i].data.map((el, i, arr) => {
         const [key] = Object.keys(el)
         return {
           x: key,
-          y: Object.values(arr[i === 167 ? i : i + 1]) / Object.values(el) - 1,
+          y: Object.values(el) / Object.values(arr[i === 0 ? i : i - 1]) - 1,
         }
       })
-      newData[i].data = holderData
     }
 
     return newData
   }
 
-  const dataToPass = datafromfunc
-  const result = rateGraphEnergyData(dataToPass)
-  console.log(result)
-  // Tengo que formatear la data bien pq realmente es x: ano y y: valor de ese ano
-
   return (
     <>
+      {console.log('Renderizo return de app')}
       <div className="App">
-        {dataRow.length > 0 ? (
-          <>
-            <AgGrid
-              rowData={dataRow}
-              columns={dataColumns}
-              title="Completion CSV"
-            />
-            <AgGrid
-              rowData={dataRowP}
-              columns={dataColumnsP}
-              title="Production CSV"
-            />
-          </>
-        ) : (
-          'Loading'
-        )}
-      </div>
-      <div style={{ overflowX: 'scroll', padding: '1rem 5rem' }}>
-        <div style={{ height: '70vh', width: '4000px' }}>
-          <NivoVisualization data={result} />
-        </div>
+        <section className="start-section">
+          <div className="input-search">
+            <InputButton setFil={setFilt} />
+          </div>
+        </section>
+        <section className="grid-section-container">
+          {dataRow.length > 0 ? (
+            <>
+              <AgGrid
+                rowData={dataRow}
+                columns={dataColumns}
+                title="Completion CSV"
+              />
+              <AgGrid
+                rowData={dataRowP}
+                columns={dataColumnsP}
+                title="Production CSV"
+              />
+            </>
+          ) : (
+            'Loading'
+          )}
+        </section>
+        <section className="Visualization-container">
+          <div>
+            <h1>Visualization of the Rate for different energies over time</h1>
+            <div style={{ height: '70vh', width: '100%' }}>
+              <NivoVisualization data={dataForG} />
+            </div>
+          </div>
+        </section>
       </div>
     </>
   )

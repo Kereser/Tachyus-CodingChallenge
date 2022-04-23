@@ -1,9 +1,11 @@
+import React from 'react'
 import { AgGridReact } from 'ag-grid-react'
 
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css'
 
 const AgGrid = ({ rowData, columns, title }) => {
+  console.log('Renderizo AgGrid')
   const columnDefs = columns.map((col) => {
     return {
       field: col,
@@ -11,11 +13,11 @@ const AgGrid = ({ rowData, columns, title }) => {
   })
 
   return (
-    <div className="container-grid">
+    <div style={{ width: '100%' }}>
       <h1>Grid of: {title}</h1>
       <div
         className="ag-theme-alpine-dark"
-        style={{ height: '70vh', minWidth: '100%', padding: '1rem 5rem' }}
+        style={{ height: '70vh', minWidth: '100%' }}
       >
         <AgGridReact rowData={rowData} columnDefs={columnDefs} />
       </div>
@@ -23,4 +25,4 @@ const AgGrid = ({ rowData, columns, title }) => {
   )
 }
 
-export default AgGrid
+export default React.memo(AgGrid)
