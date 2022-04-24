@@ -36,10 +36,6 @@ body {
 
 /* Start Section */
 
-.start-section {
-  height: 45vh;
-}
-
 .input-search {
   display: flex;
   align-items: center;
@@ -66,8 +62,8 @@ body {
 }
 
 /* Grid Section // Visualization Section*/
-.grid-section-container,
-.visualization-section {
+.grid-container,
+.visualization {
   padding: 1rem 5rem;
 }
 
@@ -75,7 +71,7 @@ body {
   overflow: scroll;
 }
 
-.grid-section-container {
+.grid-container {
   display: flex;
   grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
@@ -161,4 +157,15 @@ h1 {
   justify-content: center;
   align-items: center;
   letter-spacing: 1px;
+}
+
+/* Make a section apart to make a reusable css */
+
+.section {
+  padding: 5rem 2rem;
+  height: 100vh;
+}
+
+.half-section {
+  height: 45vh;
 }

@@ -11,6 +11,7 @@ import Notification from './components/Notification'
 
 // ContexProviderCSV
 import CsvContex from './context/contextcsv'
+import Map from './components/Map'
 
 function App() {
   const [dataForG, setDataForG] = useState([])
@@ -150,7 +151,7 @@ function App() {
     <>
       <div className="App">
         <Notification notify={notify} />
-        <section className="start-section">
+        <section className="start half-section">
           <div className="input-section">
             <InputButton
               label={'Enter a filter'}
@@ -161,7 +162,7 @@ function App() {
             </div>
           </div>
         </section>
-        <section className="grid-section-container">
+        <section className="grid-container section">
           {dataRow.length > 0 ? (
             <>
               <AgGrid
@@ -179,13 +180,16 @@ function App() {
             'Loading'
           )}
         </section>
-        <section className="visualization-section">
+        <section className="visualization section">
           <div>
             <h1>Visualization of the Rate for different energies over time</h1>
             <div style={{ height: '70vh', width: '100%' }}>
               <Visualization data={dataForG} />
             </div>
           </div>
+        </section>
+        <section className="map section">
+          <Map />
         </section>
       </div>
     </>

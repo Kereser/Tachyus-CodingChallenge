@@ -11,6 +11,7 @@ const AgGrid = ({ rowData, columns, title }) => {
   const columnDefs = columns.map((col) => {
     return {
       field: col,
+      sortable: true,
     }
   })
 
@@ -62,9 +63,6 @@ const AgGrid = ({ rowData, columns, title }) => {
           rowSelection={'single'}
           onSelectionChanged={onSelectionChanged}
         />
-      </div>
-      <div className="header">
-        To select, click on user or press ctrl + click to select more than one.
       </div>
     </div>
   )
