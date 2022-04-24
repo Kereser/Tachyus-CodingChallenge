@@ -3,10 +3,11 @@ import { csv } from 'd3'
 import pDatacsv from './data/dataP.csv'
 import cDataCsv from './data/dataC.csv'
 
+//Components
 import AgGrid from './components/AgGrid'
-// import NivoVisualization from './components/NivoVisualization'
 import InputButton from './components/InputButton'
 import Visualization from './components/Visualization'
+import Notification from './components/Notification'
 
 // ContexProviderCSV
 import CsvContex from './context/contextcsv'
@@ -19,6 +20,7 @@ function App() {
     dataColumns,
     dataRowP,
     dataColumnsP,
+    notify,
     setDataRow,
     setDataColumns,
     setDataRowP,
@@ -91,7 +93,6 @@ function App() {
     }
 
     let otherData = [['Year', 'Oil', 'Water', 'Gas', 'WaterInj']]
-
     // ? Making the data in the right format.
     for (let i = 0; i < 4; i++) {
       // I create the years with the valies of oil
@@ -120,10 +121,9 @@ function App() {
     for (let i = 1; i < 5; i++) {
       // 'For' to go through energies
       // Starting at 1 to not take the year value
-      // Changing the arrayToUse because if not, im going to work with the same as always and im getting the changes only in the last energy column
+      // Changing the arrayToUse because if not, im going to work with the same as always and im going to change only in the last energy column
       let arrayToUse = i === 1 ? otherData : newArr
       newArr = arrayToUse.map((el, j, arr) => {
-        // Change the values for the Oil
         if (j === 0) return el
         const fOValue = el[i]
         const sOValue = arr[j - 1][i]
@@ -133,6 +133,8 @@ function App() {
         return copy
       })
     }
+    // The logic for get the rate for one year is divide it by the previous one.
+    // As we don't have date for 2004, I harcoding the rate for 2005 to 0.
     const firstRow = [2005, 0, 0, 0, 0]
     newArr[0] = firstRow
     newArr.unshift(headers)
@@ -147,12 +149,16 @@ function App() {
   return (
     <>
       <div className="App">
+        <Notification notify={notify} />
         <section className="start-section">
-          <div className="input-search">
+          <div className="input-section">
             <InputButton
               label={'Enter a filter'}
               btnLabel={'Click to filter'}
             />
+            <div>
+              <h3 className="sub-heading">Let empty to see all data</h3>
+            </div>
           </div>
         </section>
         <section className="grid-section-container">

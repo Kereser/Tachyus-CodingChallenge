@@ -10,8 +10,14 @@ import CsvContext from '../context/contextcsv'
 const InputButton = ({ label, btnLabel }) => {
   const [inputUser, setInputUser] = useState('')
 
-  const { initialData, initialDataP, setDataRow, setDataRowP, setInitialData } =
-    useContext(CsvContext)
+  const {
+    initialData,
+    initialDataP,
+    setDataRow,
+    setDataRowP,
+    setInitialData,
+    setNotify,
+  } = useContext(CsvContext)
 
   const filterFunction = (inputUser, initialData) => {
     const dataC = initialData.filter((d) =>
@@ -21,9 +27,13 @@ const InputButton = ({ label, btnLabel }) => {
 
     console.log(!!dataC)
     if (dataC.length === 0) {
-      window.alert(
-        "----The wells name you entered doesn't have a successful match---- \n --------Please try again-------- \n",
-      )
+      setTimeout(() => {
+        setNotify({ message: '', state: 'noneState' })
+      }, 5000)
+      setNotify({
+        message: "The wells name you entered doesn't have a successful match",
+        state: 'failed',
+      })
       setDataRow(initialData)
       setDataRowP(initialDataP)
       setInputUser('')
@@ -48,13 +58,27 @@ const InputButton = ({ label, btnLabel }) => {
       const dividedNames = wellsNames.split(',')
       console.log(dividedNames)
       if (dividedNames[0] === '') {
-        window.alert('Please select a well')
+        setTimeout(() => {
+          setNotify({ message: '', state: 'noneState' })
+        }, 5000)
+        setNotify({
+          message: 'You have to select a well',
+          state: 'failed',
+        })
         setInputUser('')
+        return
       }
 
       if (inputUser === '') {
-        window.alert('Have to enter a replace name')
+        setTimeout(() => {
+          setNotify({ message: '', state: 'noneState' })
+        }, 5000)
+        setNotify({
+          message: 'You have to enter a replace name',
+          state: 'failed',
+        })
         setInputUser('')
+        return
       }
 
       // Logic to change the wellname/s
@@ -63,6 +87,13 @@ const InputButton = ({ label, btnLabel }) => {
           ? { ...d, wellName: inputUser }
           : d
       })
+      setTimeout(() => {
+        setNotify({ message: '', state: 'noneState' })
+      }, 5000)
+      setNotify({
+        message: 'Name has been changed',
+        state: 'success',
+      })
       setInitialData(newData)
       filterFunction(inputUser, newData)
       setInputUser('')
@@ -70,11 +101,11 @@ const InputButton = ({ label, btnLabel }) => {
   }
 
   return (
-    <>
+    <div className="input-search">
       <FormControl>
         <TextField
           label={label}
-          style={{ width: '100px' }}
+          style={{ width: '150px' }}
           id="outlined-size-small"
           size="small"
           value={inputUser}
@@ -88,7 +119,7 @@ const InputButton = ({ label, btnLabel }) => {
       >
         {btnLabel}
       </Button>
-    </>
+    </div>
   )
 }
 

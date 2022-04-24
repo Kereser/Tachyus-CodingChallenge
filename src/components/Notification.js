@@ -1,1 +1,8 @@
-// Crear componente para que no quede la vaina tan simple y jugar con el scroll reveal.
+// Simple component to display informaton to user.
+
+const Notification = ({ notify }) => {
+  const { message, state } = notify
+  return <div className={state}>{message}</div>
+}
+
+export default Notification

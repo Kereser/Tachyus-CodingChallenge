@@ -9,7 +9,9 @@ export function CsvContextProvider({ children }) {
   const [dataColumnsP, setDataColumnsP] = useState([])
   const [initialData, setInitialData] = useState([])
   const [initialDataP, setInitialDataP] = useState([])
+  const [notify, setNotify] = useState({ message: '', state: 'noneState' })
 
+  //? I use the context to get something like a GlobalState.
   return (
     <Context.Provider
       value={{
@@ -19,6 +21,8 @@ export function CsvContextProvider({ children }) {
         dataColumnsP,
         initialData,
         initialDataP,
+        notify,
+        setNotify,
         setDataRow,
         setDataColumns,
         setDataRowP,
