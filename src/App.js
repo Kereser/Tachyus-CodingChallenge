@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useContext } from 'react'
 import { csv } from 'd3'
 import pDatacsv from './data/dataP.csv'
 import cDataCsv from './data/dataC.csv'
@@ -8,15 +8,24 @@ import AgGrid from './components/AgGrid'
 import InputButton from './components/InputButton'
 import Visualization from './components/Visualization'
 
+// ContexProviderCSV
+import CsvContex from './context/contextcsv'
+
 function App() {
-  const [dataRow, setDataRow] = useState([])
-  const [initialData, setInitialData] = useState([])
-  const [dataColumns, setDataColumns] = useState([])
-  const [dataRowP, setDataRowP] = useState([])
-  const [initialDataP, setInitialDataP] = useState([])
-  const [dataColumnsP, setDataColumnsP] = useState([])
-  const [filt, setFilt] = useState('')
   const [dataForG, setDataForG] = useState([])
+
+  const {
+    dataRow,
+    dataColumns,
+    dataRowP,
+    dataColumnsP,
+    setDataRow,
+    setDataColumns,
+    setDataRowP,
+    setDataColumnsP,
+    setInitialData,
+    setInitialDataP,
+  } = useContext(CsvContex)
 
   useEffect(() => {
     csv(cDataCsv).then((data) => {
@@ -37,29 +46,10 @@ function App() {
       setInitialDataP(newDataP)
       setDataColumnsP([...data.columns, 'Gross'])
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useEffect(() => {
-    const rowInformation = initialData.find((d) => d.wellName === filt)
-    // Another state to change one and be able to show with the other a updated state.
-
-    if (!rowInformation) {
-      setDataRow(initialData)
-      setDataRowP(initialDataP)
-    } else {
-      const dataC = initialData.filter(
-        (d) => d.wellAPI === rowInformation.wellAPI,
-      )
-      const dataP = initialDataP.filter(
-        (d) => d.wellAPI === rowInformation.wellAPI,
-      )
-      setDataRow(dataC)
-      setDataRowP(dataP)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filt])
-
-  const getDataForGraph = () => {
+  const getDataForGraph = useCallback(() => {
     let data = [
       {
         id: 'Oil',
@@ -147,20 +137,22 @@ function App() {
     newArr[0] = firstRow
     newArr.unshift(headers)
     return newArr
-  }
+  }, [dataRowP])
 
   useEffect(() => {
     const r = getDataForGraph()
     setDataForG(r)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataRowP])
+  }, [getDataForGraph])
 
   return (
     <>
       <div className="App">
         <section className="start-section">
           <div className="input-search">
-            <InputButton setFil={setFilt} />
+            <InputButton
+              label={'Enter a filter'}
+              btnLabel={'Click to filter'}
+            />
           </div>
         </section>
         <section className="grid-section-container">
@@ -181,7 +173,7 @@ function App() {
             'Loading'
           )}
         </section>
-        <section className="Visualization-container">
+        <section className="visualization-section">
           <div>
             <h1>Visualization of the Rate for different energies over time</h1>
             <div style={{ height: '70vh', width: '100%' }}>

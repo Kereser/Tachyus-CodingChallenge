@@ -50,16 +50,29 @@ body {
 
 /* Grid Section // Visualization Section*/
 .grid-section-container,
-.Visualization-container {
+.visualization-section {
   padding: 1rem 5rem;
+}
+
+.agGrid-container {
+  overflow: scroll;
 }
 
 .grid-section-container {
   display: flex;
   grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
+  height: 70vh;
 }
 
 h1 {
   color: var(--heading-color);
+}
+
+/* Ag-grid styles */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
