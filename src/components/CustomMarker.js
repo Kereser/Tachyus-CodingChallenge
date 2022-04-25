@@ -1,7 +1,13 @@
 import { useState } from 'react'
 import { Marker, InfoWindow } from '@react-google-maps/api'
+
+// Icons
 import redDot from '../icons/red-dot.png'
 import greenDot from '../icons/green-dot.png'
+
+//Mui Components
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
 const CustomMarker = ({ lat, lng, wellName, wellAPI, TD, Type, reservoir }) => {
   const [showInfo, setShowInfo] = useState(false)
@@ -27,13 +33,38 @@ const CustomMarker = ({ lat, lng, wellName, wellAPI, TD, Type, reservoir }) => {
     >
       {showInfo && (
         <InfoWindow>
-          <div>
-            <h3 className="sub-heading">{`Name: ${wellName}`}</h3>
-            <h3 className="sub-heading">{`wellAPI: ${wellAPI}`}</h3>
-            <h3 className="sub-heading">{`TD: ${TD}`}</h3>
-            <h3 className="sub-heading">{`Type: ${Type}`}</h3>
-            <h3 className="sub-heading">{`Reservoir: ${reservoir}`}</h3>
-          </div>
+          <Box>
+            <Box>
+              <Typography
+                variant="sub-heading"
+                className="sub-heading"
+              >{`Name: ${wellName}`}</Typography>
+            </Box>
+            <Box>
+              <Typography
+                variant="sub-heading"
+                className="sub-heading"
+              >{`wellAPI: ${wellAPI}`}</Typography>
+            </Box>
+            <Box>
+              <Typography
+                variant="sub-heading"
+                className="sub-heading"
+              >{`TD: ${TD}`}</Typography>
+            </Box>
+            <Box>
+              <Typography
+                variant="sub-heading"
+                className="sub-heading"
+              >{`Type: ${Type}`}</Typography>
+            </Box>
+            <Box>
+              <Typography
+                variant="sub-heading"
+                className="sub-heading"
+              >{`Reservoir: ${reservoir}`}</Typography>
+            </Box>
+          </Box>
         </InfoWindow>
       )}
     </Marker>

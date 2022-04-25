@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useContext } from 'react'
+import { useEffect, useContext } from 'react'
 import { csv } from 'd3'
 import pDatacsv from './data/dataP.csv'
 import cDataCsv from './data/dataC.csv'
@@ -8,14 +8,19 @@ import AgGrid from './components/AgGrid'
 import InputButton from './components/InputButton'
 import Visualization from './components/Visualization'
 import Notification from './components/Notification'
+import Map from './components/Map'
+
+//Mui Components
+import Container from '@mui/material/Container'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Skeleton from '@mui//material/Skeleton'
 
 // ContexProviderCSV
 import CsvContex from './context/contextcsv'
-import Map from './components/Map'
+import MenuBar from './components/MenuBar'
 
 function App() {
-  const [dataForG, setDataForG] = useState([])
-
   const {
     dataRow,
     dataColumns,
@@ -52,117 +57,29 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const getDataForGraph = useCallback(() => {
-    let data = [
-      {
-        id: 'Oil',
-        data: [],
-      },
-      {
-        id: 'Water',
-        data: [],
-      },
-      {
-        id: 'Gas',
-        data: [],
-      },
-      {
-        id: 'WaterInj',
-        data: [],
-      },
-    ]
-
-    for (let k = 0; k < 4; k++) {
-      // k for energies
-      for (let i = 2005; i < 2019; i++) {
-        // i for years
-        const arrayEveryYear = dataRowP.filter((d) => {
-          return d['Year'] === i.toString(10)
-        })
-        // Assign the value of the corresponding energy
-
-        data[k]['data'].push({
-          [i]:
-            arrayEveryYear.reduce((acc, el) => {
-              return (
-                acc +
-                +el[k === 0 ? 'Qo' : k === 1 ? 'Qw' : k === 2 ? 'Qg' : 'Qs']
-              )
-            }, 0) / arrayEveryYear.length,
-        })
-      }
-    }
-
-    let otherData = [['Year', 'Oil', 'Water', 'Gas', 'WaterInj']]
-    // ? Making the data in the right format.
-    for (let i = 0; i < 4; i++) {
-      // I create the years with the valies of oil
-      if (i === 0) {
-        data[i]['data'].forEach((d) => {
-          const year = Object.keys(d)
-          otherData.push([parseInt(year, 10), d[year]])
-        })
-      }
-      // I have to modify those array to concat the rest of values of the other energies
-      // d === {2005: valor}
-      else {
-        otherData.map((el, j) => {
-          if (j === 0) return el
-          return el.push(Object.values(data[i]['data'][j - 1])[0])
-        })
-      }
-    }
-
-    // I need to find the rate.
-    // The rate is the difference between a value and the previous one.
-
-    const headers = otherData.shift()
-
-    let newArr = []
-    for (let i = 1; i < 5; i++) {
-      // 'For' to go through energies
-      // Starting at 1 to not take the year value
-      // Changing the arrayToUse because if not, im going to work with the same as always and im going to change only in the last energy column
-      let arrayToUse = i === 1 ? otherData : newArr
-      newArr = arrayToUse.map((el, j, arr) => {
-        if (j === 0) return el
-        const fOValue = el[i]
-        const sOValue = arr[j - 1][i]
-        const rate = fOValue / sOValue - 1
-        const copy = [...el]
-        copy[i] = rate
-        return copy
-      })
-    }
-    // The logic for get the rate for one year is divide it by the previous one.
-    // As we don't have date for 2004, I harcoding the rate for 2005 to 0.
-    const firstRow = [2005, 0, 0, 0, 0]
-    newArr[0] = firstRow
-    newArr.unshift(headers)
-    return newArr
-  }, [dataRowP])
-
-  useEffect(() => {
-    const r = getDataForGraph()
-    setDataForG(r)
-  }, [getDataForGraph])
-
   return (
     <>
-      <div className="App">
+      <Container>
         <Notification notify={notify} />
+        <MenuBar />
         <section className="start half-section">
-          <div className="input-section">
+          <Box className="input-section">
             <InputButton
               label={'Enter a filter'}
               btnLabel={'Click to filter'}
             />
-            <div>
-              <h3 className="sub-heading">Let empty to see all data</h3>
-            </div>
-          </div>
+            <Box>
+              <Typography
+                className="sub-heading"
+                variant="sub-heading"
+                sx={{ lineHeight: '20px' }}
+              >
+                Let empty to see all data
+              </Typography>
+            </Box>
+          </Box>
         </section>
-        <section className="grid-container section">
+        <section className="grid-container section" id="Grid">
           {dataRow.length > 0 ? (
             <>
               <AgGrid
@@ -177,21 +94,28 @@ function App() {
               />
             </>
           ) : (
-            'Loading'
+            <Skeleton variant="rectangular" width={'100%'} height={'100%'} />
           )}
         </section>
-        <section className="visualization section">
-          <div>
-            <h1>Visualization of the Rate for different energies over time</h1>
-            <div style={{ height: '70vh', width: '100%' }}>
-              <Visualization data={dataForG} />
-            </div>
-          </div>
+        <section className="visualization section" id="Visualization">
+          <Box sx={{ height: '100%' }}>
+            <Typography className="heading" variant="h4">
+              Visualization of the Rate for different energies over time
+            </Typography>
+            <Box sx={{ height: '93%', width: '100%' }}>
+              <Visualization />
+            </Box>
+          </Box>
         </section>
-        <section className="map section">
-          <Map />
+        <section className="map section" id="Map">
+          <Box sx={{ height: '100%' }}>
+            <Typography className="heading" variant="h4">
+              Map with markers at wells locations
+            </Typography>
+            <Map />
+          </Box>
         </section>
-      </div>
+      </Container>
     </>
   )
 }

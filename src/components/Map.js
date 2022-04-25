@@ -6,6 +6,9 @@ import CustomMarker from './CustomMarker'
 // State from Context
 import ContextCsv from '../context/contextcsv'
 
+//Mui Components
+import Box from '@mui/material/Box'
+
 const center = { lat: -33.17877677, lng: 21.21233603 }
 
 const Map = () => {
@@ -36,7 +39,7 @@ const Map = () => {
   // I have to build 246 customMarkers
 
   return (
-    <div style={{ height: '100%' }}>
+    <Box style={{ height: '93%' }}>
       <GoogleMap
         center={center}
         zoom={12.5}
@@ -50,7 +53,7 @@ const Map = () => {
           <CustomMarker key={props.lat + props.lng} {...props} />
         ))}
       </GoogleMap>
-    </div>
+    </Box>
   )
 }
 

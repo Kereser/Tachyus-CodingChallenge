@@ -2,8 +2,15 @@ import React, { useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 
 import 'ag-grid-community/dist/styles/ag-grid.css'
-import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css'
+import 'ag-grid-community/dist/styles/ag-theme-alpine.css'
+import 'ag-grid-community/dist/styles/ag-theme-alpine.css'
+
+//Components
 import InputButton from './InputButton'
+
+// Mui Components
+import Typography from '@mui/material/Typography'
+import Box from '@mui/material/Box'
 
 const AgGrid = ({ rowData, columns, title }) => {
   const gridRef = useRef()
@@ -23,11 +30,17 @@ const AgGrid = ({ rowData, columns, title }) => {
   }, [])
 
   return title !== 'Completion CSV' ? (
-    <div style={{ width: '100%' }}>
-      <h1 style={{ marginBottom: '60px' }}>Grid of: {title}</h1>
-      <div
+    <Box style={{ width: '100%' }}>
+      <Typography
+        className="heading"
+        variant="h4"
+        sx={{ marginBottom: '40px' }}
+      >
+        Grid of: {title}
+      </Typography>
+      <Box
         id="myGrid"
-        className="ag-theme-alpine-dark"
+        className="ag-theme-alpine"
         style={{ height: '80%', minWidth: '100%' }}
       >
         <AgGridReact
@@ -37,23 +50,25 @@ const AgGrid = ({ rowData, columns, title }) => {
           rowSelection={'multiple'}
           onSelectionChanged={onSelectionChanged}
         />
-      </div>
-    </div>
+      </Box>
+    </Box>
   ) : (
-    <div style={{ width: '100%' }}>
-      <h1>Grid of: {title}</h1>
-      <div className="header">
-        <div className="header-rows">
+    <Box style={{ width: '100%' }}>
+      <Typography className="heading" variant="h4">
+        Grid of: {title}
+      </Typography>
+      <Box className="header">
+        <Box className="header-rows">
           Selection:
-          <span id="selectedRows"></span>
-        </div>
-        <div className="input-button">
+          <Box component={'span'} id="selectedRows"></Box>
+        </Box>
+        <Box className="input-button">
           <InputButton label={'Replace name'} btnLabel={'Change'} />
-        </div>
-      </div>
-      <div
+        </Box>
+      </Box>
+      <Box
         id="myGrid"
-        className="ag-theme-alpine-dark"
+        className="ag-theme-alpine"
         style={{ height: '80%', minWidth: '100%' }}
       >
         <AgGridReact
@@ -63,8 +78,8 @@ const AgGrid = ({ rowData, columns, title }) => {
           rowSelection={'single'}
           onSelectionChanged={onSelectionChanged}
         />
-      </div>
-    </div>
+      </Box>
+    </Box>
   )
 }
 

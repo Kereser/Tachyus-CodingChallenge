@@ -1,11 +1,13 @@
 import React, { useState, useContext } from 'react'
 
+// Context =>
+import CsvContext from '../context/contextcsv'
+
+// Mui Components
+import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import FormControl from '@mui/material/FormControl'
 import Button from '@mui/material/Button'
-
-// Context =>
-import CsvContext from '../context/contextcsv'
 
 const InputButton = ({ label, btnLabel }) => {
   const [inputUser, setInputUser] = useState('')
@@ -98,7 +100,7 @@ const InputButton = ({ label, btnLabel }) => {
   }
 
   return (
-    <div className="input-search">
+    <Box className="input-search">
       <FormControl>
         <TextField
           label={label}
@@ -116,7 +118,7 @@ const InputButton = ({ label, btnLabel }) => {
       >
         {btnLabel}
       </Button>
-    </div>
+    </Box>
   )
 }
 

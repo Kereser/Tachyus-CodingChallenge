@@ -64,7 +64,7 @@ body {
 /* Grid Section // Visualization Section*/
 .grid-container,
 .visualization {
-  padding: 1rem 5rem;
+  padding: 1rem 0;
 }
 
 .agGrid-container {
@@ -78,7 +78,7 @@ body {
   height: 70vh;
 }
 
-h1 {
+.heading {
   color: var(--heading-color);
 }
 
@@ -95,6 +95,7 @@ h1 {
 .failed {
   height: 150px;
   width: 100%;
+  margin-bottom: 2rem;
   background-color: rgba(210, 195, 248, 0.5);
   color: #811;
   border-radius: 20px;
@@ -118,6 +119,7 @@ h1 {
 .success {
   height: 150px;
   width: 100%;
+  margin-bottom: 2rem;
   background-color: rgba(210, 195, 248, 0.5);
   color: #181;
   border-radius: 20px;
@@ -141,6 +143,7 @@ h1 {
 .noneState {
   height: 100px;
   width: 100%;
+  margin-bottom: 2rem;
   background-color: transparent;
   position: absolute;
   top: 0;
@@ -162,10 +165,17 @@ h1 {
 /* Make a section apart to make a reusable css */
 
 .section {
-  padding: 5rem 2rem;
+  padding: 5rem 0;
   height: 100vh;
 }
 
 .half-section {
   height: 45vh;
+}
+
+/* Menu button */
+
+.menu-button {
+  background-color: white;
+  color: var(--heading-color);
 }
