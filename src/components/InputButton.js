@@ -51,12 +51,9 @@ const InputButton = ({ label, btnLabel }) => {
     if (label === 'Enter a filter') {
       filterFunction(inputUser, initialData)
     } else {
-      // Logic to change the wellname/s
-      console.log(initialData, initialDataP)
-
+      // Logic to change the wellName
       const wellsNames = document.querySelector('#selectedRows').innerHTML
       const dividedNames = wellsNames.split(',')
-      console.log(dividedNames)
       if (dividedNames[0] === '') {
         setTimeout(() => {
           setNotify({ message: '', state: 'noneState' })

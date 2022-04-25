@@ -11,9 +11,9 @@ const center = { lat: -33.17877677, lng: 21.21233603 }
 const Map = () => {
   const { dataRow } = useContext(ContextCsv)
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: 'AIzaSyDOO_WW_Q9zGdWQaoeMld3bBmipdHNvu5k',
+    //Have to harcoding the api key ***HERE***
+    googleMapsApiKey: process.env.REACT_APP_API_KEY,
   })
-  console.log(isLoaded)
   if (!isLoaded) {
     return <h1>Loading</h1>
   }
